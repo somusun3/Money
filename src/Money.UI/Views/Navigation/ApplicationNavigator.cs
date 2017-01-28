@@ -48,7 +48,10 @@ namespace Money.Views.Navigation
             if (template != null)
             {
                 if (NavigateBack(template.ContentFrame))
+                {
+                    isBackNavigation = true;
                     return;
+                }
 
                 isOutcome = template.ContentFrame.Content is OutcomeCreate;
             }
@@ -121,6 +124,8 @@ namespace Money.Views.Navigation
         }
 
         private object lastParameter;
+        private bool isIgnoreBackPage;
+        private bool isBackNavigation;
 
         private void OnTemplateContentFrameNavigating(object sender, NavigatingCancelEventArgs e)
         {
@@ -145,6 +150,9 @@ namespace Money.Views.Navigation
                 lastParameter = null;
             else
                 lastParameter = parameterPage.Parameter;
+
+            INavigatorIgnoreBackPage ignoreBackPage = frame.Content as INavigatorIgnoreBackPage;
+            isIgnoreBackPage = ignoreBackPage != null;
         }
 
         private void OnTemplateContentFrameNavigated(object sender, NavigationEventArgs e)
@@ -181,6 +189,22 @@ namespace Money.Views.Navigation
                     template.ContentFrame.BackStack.Add(lastEntry);
                 }
             }
+            else if(isIgnoreBackPage)
+            {
+                PageStackEntry lastEntry = template.ContentFrame.BackStack.LastOrDefault();
+                if (lastEntry != null && !isBackNavigation)
+                {
+                    template.ContentFrame.BackStack.Remove(lastEntry);
+                }
+                else
+                {
+                    lastEntry = template.ContentFrame.ForwardStack.LastOrDefault();
+                    if (lastEntry != null)
+                        template.ContentFrame.ForwardStack.Remove(lastEntry);
+                }
+            }
+
+            isBackNavigation = false;
         }
 
         private void OnTemplateContentPageLoaded(object sender, EventArgs e)

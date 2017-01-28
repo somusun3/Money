@@ -32,7 +32,7 @@ using Windows.UI.Xaml.Navigation;
 namespace Money.Views
 {
     [NavigationParameter(typeof(OutcomeParameter))]
-    public sealed partial class OutcomeCreate : Page
+    public sealed partial class OutcomeCreate : Page, INavigatorIgnoreBackPage
     {
         private readonly IDomainFacade domainFacade = ServiceProvider.DomainFacade;
         private readonly INavigator navigator = ServiceProvider.Navigator;
